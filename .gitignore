@@ -1,0 +1,39 @@
+# -----------------------------------------------------------------------------
+# Ignora arquivos de sistemas, IDEs e ambiente de desenvolvimento
+# -----------------------------------------------------------------------------
+.DS_Store
+.env
+.idea/
+.vscode/
+
+# Ambientes virtuais Python
+venv/
+.venv/
+
+# Arquivos de cache e temporários do Python
+__pycache__/
+*.pyc
+*.egg-info/
+.ipynb_checkpoints/
+
+# -----------------------------------------------------------------------------
+# Ignora pastas de dados
+# -----------------------------------------------------------------------------
+# Pastas de dados brutos e data warehouse.
+# É uma prática comum NÃO versionar dados no Git, pois são pesados e mutáveis.
+# O ideal é usar ferramentas de versionamento de dados (DVC) ou armazenamento em nuvem.
+#raw/
+#dw/
+postgres-data/
+
+# -----------------------------------------------------------------------------
+# Ignora arquivos e logs do Docker e Airflow
+# -----------------------------------------------------------------------------
+# Pastas e arquivos de logs, plugins e volumes gerados pelo Docker Compose/Airflow
+logs/
+plugins/
+config/
+*.zip
+*.log
+#docker-compose.override.yml
+#docker-compose.*.yml

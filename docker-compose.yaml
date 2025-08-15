@@ -1,0 +1,97 @@
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    networks:
+      - airflow_network
+
+  airflow-init:
+    image: apache/airflow:2.7.0
+    container_name: airflow-init
+    environment:
+      AIRFLOW_UID: ${AIRFLOW_UID}
+      AIRFLOW_GID: ${AIRFLOW_GID}
+      AIRFLOW_HOME: /opt/airflow
+      AIRFLOW_EXECUTOR: ${AIRFLOW_EXECUTOR}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY}
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./config:/opt/airflow/config
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - ./raw:/opt/airflow/raw
+      - ./dw:/opt/airflow/dw
+    entrypoint: ["/bin/bash", "-c", "airflow db init && airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com"]
+    depends_on:
+      - postgres
+    networks:
+      - airflow_network
+
+  airflow-webserver:
+    image: apache/airflow:2.7.0
+    container_name: airflow-webserver
+    environment:
+      AIRFLOW_UID: ${AIRFLOW_UID}
+      AIRFLOW_GID: ${AIRFLOW_GID}
+      AIRFLOW_HOME: /opt/airflow
+      AIRFLOW_EXECUTOR: ${AIRFLOW_EXECUTOR}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      AIRFLOW__WEBSERVER__SECRET_KEY: 'your-secret-key-here'
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./config:/opt/airflow/config
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - ./raw:/opt/airflow/raw
+      - ./dw:/opt/airflow/dw
+
+    command: ["airflow", "webserver"]
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8080/health"]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+    depends_on:
+      - postgres
+    networks:
+      - airflow_network
+
+  airflow-scheduler:
+    image: apache/airflow:2.7.0
+    container_name: airflow-scheduler
+    environment:
+      AIRFLOW_UID: ${AIRFLOW_UID}
+      AIRFLOW_GID: ${AIRFLOW_GID}
+      AIRFLOW_HOME: /opt/airflow
+      AIRFLOW_EXECUTOR: ${AIRFLOW_EXECUTOR}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      AIRFLOW__WEBSERVER__SECRET_KEY: 'your-secret-key-here'
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./config:/opt/airflow/config
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - ./raw:/opt/airflow/raw
+      - ./dw:/opt/airflow/dw
+    command: ["airflow", "scheduler"]
+    depends_on:
+      - postgres
+    networks:
+      - airflow_network
+
+networks:
+  airflow_network:
+    name: airflow_network
+    driver: bridge
+    external: true
