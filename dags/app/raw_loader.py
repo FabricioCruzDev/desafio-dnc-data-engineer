@@ -1,9 +1,8 @@
 import pandas as pd
 import os
-import pyarrow
 
    
-def loader():
+def upload_raw_data_to_bronze():
     df_bronze = pd.read_csv('./raw/raw_data.csv', sep=',', encoding='UTF-8', index_col='id')
     print(df_bronze.sample(10))
     df_bronze.info()
