@@ -4,6 +4,7 @@ from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
 from app.raw_loader import upload_raw_data_to_bronze
 from app.silver_transform import process_bronze_to_silver
+from app.gold_transform import process_silver_to_gold
 
 import os
 
@@ -34,25 +35,9 @@ with DAG(
         python_callable = process_bronze_to_silver
     )
 
-    task_1 >> task_2  
-
-# Clean data from bronze to silver
-
-with DAG(
-    dag_id = 'transform_dag',
-    default_args = default_args,
-    description = 'transform bronze data',
-    start_date = datetime(2025, 1, 1),
-    schedule_interval = '@daily',
-    catchup = False
-) as dag:
-    
-    task_2 = PythonOperator(
-        task_id = "process-bronze-to-silver",
-        python_callable = process_bronze_to_silver
+    task_3 = PythonOperator(
+        task_id = "process-silver-to-gold",
+        python_callable = process_silver_to_gold
     )
 
-    task_2
-# Transform cleansed data from silver to gold
-
-# tasks
+    task_1 >> task_2 >> task_3

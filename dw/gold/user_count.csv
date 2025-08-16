@@ -1,0 +1,13 @@
+;age_group;subscription_status;count
+2;11 a 20;active;535
+3;11 a 20;inactive;516
+4;21 a 30;active;2844
+5;21 a 30;inactive;2953
+6;31 a 40;active;2920
+7;31 a 40;inactive;2895
+8;41 a 50;active;2928
+9;41 a 50;inactive;2859
+10;51 a 60;active;2840
+11;51 a 60;inactive;2877
+12;60 +;active;9065
+13;60 +;inactive;8963

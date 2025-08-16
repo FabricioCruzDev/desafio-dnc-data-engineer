@@ -36,7 +36,7 @@ def calculate (df_clean):
     print(df_clean.info())
     return df_clean
 
-def load (df_silver):
+def upload (df_silver):
     print("Salvando o dataset na pasta silver no formato parquet")
     output_dir = './dw/silver'
     output_file = os.path.join(output_dir, 'silver_data.parquet')
@@ -48,4 +48,4 @@ def process_bronze_to_silver():
     df_bronze = load_data('./dw/bronze')
     df_clean = clean(df_bronze)
     df_silver = calculate(df_clean)
-    load(df_silver)
+    upload(df_silver)
